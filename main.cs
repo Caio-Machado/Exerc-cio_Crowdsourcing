@@ -25,6 +25,12 @@ class MainClass {
     //Atributo que registra qual ideia o usuário escolheu votar
     int respostaUsuarioVoto;
 
+    //Atributo que guarda o indice da ideia mais votada
+    int primeiroLugar, segundoLugar, terceiroLugar, ideiaVencedora = 0;
+
+    //Atributo que guarda o total de votos ja realizados
+    double totalGeralVotos = 0;
+
     //Atributos que quardam as especificações de uma Idéia
     string registraTitulo, registraDescricao, registraArea;
 
@@ -89,14 +95,15 @@ class MainClass {
           sentinelaMenuOpcoes = false;
           while (sentinelaMenuOpcoes == false) {
             if (usuarioValidoLogin == true) {
+              Console.Clear();
               Console.WriteLine($"Bem-Vindo(a) {ListaUsuarios[usuarioLogado].getNomeUsuario()}\n");
 
               Console.WriteLine("O que deseja fazer?");
-              Console.WriteLine("1 - Cadastrar uma Idéia \n2 - Votar em Idéias \n3 - Top 3 Idéias \n3 - Sair");
+              Console.WriteLine("1 - Cadastrar uma Idéia \n2 - Votar em Idéias \n3 - Top 3 Idéias \n4 - Simular Vencedor \n5 - Sair");
               Console.Write(">> ");
               respostaUsuarioOpcoes = int.Parse(Console.ReadLine());
 
-              if (respostaUsuarioOpcoes < 1 && respostaUsuarioOpcoes > 4) {
+              if (respostaUsuarioOpcoes < 1 && respostaUsuarioOpcoes > 5) {
                 throw new ArgumentException();
               }
 
@@ -124,10 +131,11 @@ class MainClass {
 
                 case 2:
                   Console.Clear();
-                  Console.WriteLine("Lista de Idéias\n");
+                  Console.WriteLine("Lista de Idéias");
+                  Console.WriteLine("As idéias estão organizadas da mais votada até a menos votada.\n");
                   for (int c = 0; c < Repositorio.Count; c++) {
                     Repositorio[c].mostraRepositorio();
-                    Console.WriteLine("------------------------");
+                    Console.WriteLine("-----------------------------");
                   }
                   Console.Write("\nDigite o indice da Idéia que deseja votar >> ");
                   respostaUsuarioVoto = int.Parse(Console.ReadLine());
@@ -140,10 +148,89 @@ class MainClass {
 
                   else {
                     Repositorio[respostaUsuarioVoto].setVotosTotais();
+                    Console.WriteLine("Voto computado com sucesso!!");
+                    totalGeralVotos++;
+                    Pausa();
                   }
                   break;
-                
+
+                case 3:
+                  primeiroLugar = 0;
+                  segundoLugar = 0;
+                  terceiroLugar = 0;
+
+                  if (Repositorio.Count >= 3) {
+                    Console.Clear();
+                    for (int d = 0; d < Repositorio.Count; d++) {
+                      if (Repositorio[primeiroLugar].getVotosTotais() < Repositorio[d].getVotosTotais()) {
+                        primeiroLugar = d;
+                      }
+                    }
+
+                    if (segundoLugar == primeiroLugar) {
+                      segundoLugar = segundoLugar + 1;
+                    }
+
+                    for (int e = 0; e < Repositorio.Count; e++) {
+                      if (Repositorio[segundoLugar].getVotosTotais() < Repositorio[e].getVotosTotais() && Repositorio[e].getVotosTotais() != Repositorio[primeiroLugar].getVotosTotais()) {
+                        segundoLugar = e;
+                      }
+                    }
+
+                    if (terceiroLugar == primeiroLugar) {
+                      terceiroLugar = terceiroLugar + 1;
+                    }
+
+                    if (terceiroLugar == segundoLugar) {
+                      terceiroLugar = terceiroLugar + 1;
+                    }
+                    //Console.WriteLine(primeiroLugar);
+                    //Console.WriteLine(segundoLugar);
+                    //Console.WriteLine(terceiroLugar);
+
+                    for (int f = 0; f < Repositorio.Count; f++) {
+                      if (Repositorio[terceiroLugar].getVotosTotais() < Repositorio[f].getVotosTotais() && Repositorio[f] != Repositorio[primeiroLugar] && Repositorio[f].getVotosTotais() != Repositorio[segundoLugar].getVotosTotais()) {
+                        terceiroLugar = f;
+                      }
+                    }
+
+                    
+                    Console.WriteLine("----- Top 3 -----");
+
+                    Repositorio[primeiroLugar].mostraRepositorio();
+                    Console.WriteLine("-----------------------------");
+
+                    Repositorio[segundoLugar].mostraRepositorio();
+                    Console.WriteLine("-----------------------------");
+
+                    Repositorio[terceiroLugar].mostraRepositorio();
+                    Console.WriteLine("-----------------------------");
+                    Pausa();
+                    break;
+                  }
+
+                  else {
+                    Console.WriteLine("Ainda não existem 3 ideias registradas!!!");
+                    Pausa();
+                    break;
+                  }
                 case 4:
+                  Console.Clear();
+                  for (int h = 0; h < Repositorio.Count; h++) {
+                    if (Repositorio[ideiaVencedora].getVotosTotais() < Repositorio[h].getVotosTotais()) {
+                      ideiaVencedora = h;
+                    }
+                  }
+
+                  Console.WriteLine("------ Vencedor -----");
+                  Console.WriteLine("A ideia vencedora foi a:");
+                  Repositorio[ideiaVencedora].mostraRepositorio();
+
+                  Console.WriteLine($"\n Com {Repositorio[ideiaVencedora].getVotosTotais()} Likes a ideia recebera {Math.Pow((Repositorio[ideiaVencedora].getVotosTotais() / totalGeralVotos), 2) * 30000)}R$ de doação!!");
+
+                  Pausa();
+                  break;
+                case 5:
                   sentinelaMenuOpcoes = true;
                   break;
               }
